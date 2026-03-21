@@ -1,6 +1,7 @@
 pipeline {
   environment {
     DOCKER_ID = "ninine"
+
     DOCKER_MOVIE_IMAGE = "movie-service"
     BUILD_MOVIE_CONTEXT = "movie-service"
     BUILD_CAST_CONTEXT = "cast-service"
