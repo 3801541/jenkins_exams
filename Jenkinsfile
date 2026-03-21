@@ -23,8 +23,8 @@ pipeline {
         script {
           sh '''
             docker rm -f $(docker ps -aq) || true
-            docker build -t "$DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG" -f "$BUILD_MOVIE_CONTEXT/Dockerfile" "$BUILD_MOVIE_CONTEXT"
-            docker build -t "$DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG" -f "$BUILD_CAST_CONTEXT/Dockerfile" "$BUILD_CAST_CONTEXT"
+            docker build --no-cache -t "$DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG" -f "$BUILD_MOVIE_CONTEXT/Dockerfile" "$BUILD_MOVIE_CONTEXT"
+            docker build --no-cache -t "$DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG" -f "$BUILD_CAST_CONTEXT/Dockerfile" "$BUILD_CAST_CONTEXT"
             sleep 6
           '''
         }
