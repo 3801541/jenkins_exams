@@ -37,6 +37,7 @@ pipeline {
             docker network create backend || true
             docker run -d --name movie_db --network backend -e POSTGRES_USER=$POSTGRES_MOVIE_USER -e POSTGRES_PASSWORD=$POSTGRES_MOVIE_PASSWORD -e POSTGRES_DB=$POSTGRES_MOVIE_DB postgres:12.1-alpine
             docker run -d --name cast_db --network backend -e POSTGRES_USER=$POSTGRES_CAST_USER -e POSTGRES_PASSWORD=$POSTGRES_CAST_PASSWORD -e POSTGRES_DB=$POSTGRES_CAST_DB postgres:12.1-alpine
+	    sleep 30
             docker run -d --name movie_service --network backend -p 8001:8000 -e DATABASE_URI=$DATABASE_MOVIE_URI -e CAST_SERVICE_HOST_URL=$CAST_SERVICE_HOST_URL $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 --loop asyncio
             docker run -d --name cast_service --network backend -p 8002:8000 -e DATABASE_URI=$DATABASE_CAST_URI $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 --loop asyncio
             docker run -d --name nginx --network backend -p 8080:8080 -v $(pwd)/nginx_config.conf:/etc/nginx/conf.d/default.conf nginx:latest
