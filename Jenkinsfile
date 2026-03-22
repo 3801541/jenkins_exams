@@ -88,6 +88,60 @@ pipeline {
         }
       }
     }
+    stage('Deploiement en staging') {
+      environment {
+        KUBECONFIG = credentials("config")
+      }
+      steps {
+        script {
+          sh '''
+            rm -Rf .kube
+            mkdir .kube
+            cat $KUBECONFIG > .kube/config
+            helm upgrade --install movies movies --namespace staging --set image.tag="${DOCKER_TAG}"
+            helm upgrade --install casts casts --namespace staging --set image.tag="${DOCKER_TAG}"
+            helm upgrade --install nginx nginx --namespace staging
+          '''
+        }
+      }
+    }
+    stage('Deploiement en qa') {
+      environment {
+        KUBECONFIG = credentials("config")
+      }
+      steps {
+        script {
+          sh '''
+            rm -Rf .kube
+            mkdir .kube
+            cat $KUBECONFIG > .kube/config
+            helm upgrade --install movies movies --namespace qa --set image.tag="${DOCKER_TAG}"
+            helm upgrade --install casts casts --namespace qa --set image.tag="${DOCKER_TAG}"
+            helm upgrade --install nginx nginx --namespace qa
+          '''
+        }
+      }
+    }
+    stage('Deploiement en prod') {
+      environment {
+        KUBECONFIG = credentials("config")
+      }
+      steps {
+	timeout(time: 15, unit: "MINUTES") {
+          input message: 'Do you want to deploy in production ?', ok: 'Yes'
+        }
+        script {
+          sh '''
+            rm -Rf .kube
+            mkdir .kube
+            cat $KUBECONFIG > .kube/config
+            helm upgrade --install movies movies --namespace prod --set image.tag="${DOCKER_TAG}"
+            helm upgrade --install casts casts --namespace prod --set image.tag="${DOCKER_TAG}"
+            helm upgrade --install nginx nginx --namespace prod
+          '''
+        }
+      }
+    }
   }
   post {
     failure {
