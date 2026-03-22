@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cast-db
+spec:
+  selector:
+    app: cast-db
+  ports:
+    - port: {{ .Values.castDb.port }}
+      targetPort: {{ .Values.castDb.port }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "casts.fullname" . }}
+  labels:
+    {{- include "casts.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "casts.selectorLabels" . | nindent 4 }}

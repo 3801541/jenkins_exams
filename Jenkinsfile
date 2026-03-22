@@ -71,6 +71,23 @@ pipeline {
         }
       }
     }
+    stage('Deploiement en dev') {
+      environment {
+        KUBECONFIG = credentials("config")
+      }
+      steps {
+        script {
+          sh '''
+            rm -Rf .kube
+            mkdir .kube
+            cat $KUBECONFIG > .kube/config
+            helm upgrade --install movies movies --namespace dev --set image.tag="${DOCKER_TAG}"
+	    helm upgrade --install casts casts --namespace dev --set image.tag="${DOCKER_TAG}"
+	    helm upgrade --install nginx nginx --namespace dev
+          '''
+        }
+      }
+    }
   }
   post {
     failure {
